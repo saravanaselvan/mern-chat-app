@@ -34,11 +34,18 @@ app.use(errorHandler);
 
 server.listen(PORT, console.log(`Server started on PORT ${PORT}`.yellow.bold));
 io.on("connection", (socket) => {
-  console.log("A user connected");
-  socket.on("typing", ({ user, content }) => {
-    socket.broadcast.emit("typing", { user, content });
+  socket.on("setup", (userId) => {
+    socket.join(userId);
+  });
+  socket.on("typing", ({ user, currentChatId }) => {
+    socket.broadcast.emit("typing", { user, currentChatId });
   });
   socket.on("send message", ({ user, message, notification }) => {
-    socket.broadcast.emit("new message", { user, message, notification });
+    let chat = message.chat;
+    chat.users.forEach((u) => {
+      if (u._id === user._id) return;
+
+      socket.in(u._id).emit("new message", { user, message, notification });
+    });
   });
 });

@@ -38,7 +38,7 @@ io.on("connection", (socket) => {
     socket.join(userId);
   });
   socket.on("typing", ({ user, currentChatId }) => {
-    socket.broadcast.emit("typing", { user, currentChatId });
+    socket.broadcast.emit("typing", { typingUser: user, currentChatId });
   });
   socket.on("send message", ({ user, message, notification }) => {
     let chat = message.chat;
